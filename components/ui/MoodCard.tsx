@@ -28,7 +28,7 @@ export function MoodCard({
       type="button"
       onClick={() => onOpen?.(record)}
       aria-label={`${format(date, "M 月 d 日")}，${record.echo}`}
-      className={`group relative flex h-64 w-48 flex-col rounded-md bg-[#FFFDF9] p-2.5 text-left shadow-[0_8px_24px_rgba(68,64,60,0.12)] ring-1 ring-inset ring-stone-900/5 outline-none transition-all duration-300 ease-out hover:-translate-y-2 hover:rotate-0 hover:shadow-xl focus-visible:ring-2 focus-visible:ring-stone-400 sm:w-52 ${
+      className={`group relative flex h-64 w-40 flex-col rounded-md bg-[#FFFDF9] p-2.5 text-left shadow-[0_8px_24px_rgba(68,64,60,0.12)] ring-1 ring-inset ring-stone-900/5 outline-none transition-all duration-300 ease-out hover:-translate-y-2 hover:rotate-0 hover:shadow-xl focus-visible:ring-2 focus-visible:ring-stone-400 sm:w-52 ${
         tiltClassName ?? ""
       } ${className ?? ""}`}
     >

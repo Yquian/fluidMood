@@ -71,7 +71,7 @@ export default function GalleryPage() {
   }, []);
 
   return (
-    <main className="relative isolate flex h-dvh flex-col overflow-y-auto overflow-x-hidden bg-[#FDFBF7] px-6 [scrollbar-color:#E7E5E4_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar-thumb:hover]:bg-stone-300 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-stone-200 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5">
+    <main className="relative isolate flex h-dvh flex-col overflow-y-auto overflow-x-hidden bg-[#FDFBF7] px-3 [scrollbar-color:#E7E5E4_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar-thumb:hover]:bg-stone-300 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-stone-200 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5 sm:px-6">
       {/* 纸张颗粒 + 亚麻织纹 */}
       <div
         aria-hidden="true"
@@ -92,7 +92,7 @@ export default function GalleryPage() {
         }}
       />
 
-      <div className="relative z-10 mx-auto flex w-[80%] max-w-5xl flex-1 flex-col py-6 sm:py-8">
+      <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col py-6 sm:w-[80%] sm:py-8">
         <header className="flex items-center gap-3 sm:gap-4">
           <Link
             href="/"

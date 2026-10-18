@@ -48,7 +48,7 @@ export function VisualCalendar({
   return (
     <>
       <div
-        className={`flex flex-wrap justify-center gap-6 ${className ?? ""}`}
+        className={`flex flex-wrap justify-center gap-4 sm:gap-6 ${className ?? ""}`}
       >
         <AnimatePresence mode="popLayout" initial={false}>
           {sortedRecords.map((record, index) => {
