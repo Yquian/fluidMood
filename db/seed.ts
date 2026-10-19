@@ -1,9 +1,35 @@
+import { eq } from "drizzle-orm";
+
 import { db } from "./index";
-import { moodEntries } from "./schema";
+import { moodEntries, users } from "./schema";
+import { hashPassword } from "../lib/auth/password";
 
 const now = new Date();
 const daysAgo = (days: number) =>
   new Date(now.getTime() - days * 24 * 60 * 60 * 1000).toISOString();
+
+// 先在演示账号下写入数据，避免产生没有归属的孤儿记录
+const DEMO_USERNAME = "demo";
+const DEMO_PASSWORD = "demo123";
+
+let demoUser = db
+  .select({ id: users.id })
+  .from(users)
+  .where(eq(users.username, DEMO_USERNAME))
+  .all()[0];
+
+if (!demoUser) {
+  const { hash, salt } = hashPassword(DEMO_PASSWORD);
+  demoUser = db
+    .insert(users)
+    .values({
+      username: DEMO_USERNAME,
+      passwordHash: hash,
+      passwordSalt: salt,
+    })
+    .returning({ id: users.id })
+    .all()[0];
+}
 
 const entries = [
   {
@@ -56,8 +82,10 @@ const entries = [
     tags: JSON.stringify(["朋友", "晚霞", "惊喜"]),
     echo: "被惦记的感觉，会在心里亮很久。",
   },
-];
+].map((entry) => ({ ...entry, userId: demoUser.id }));
 
 const result = db.insert(moodEntries).values(entries).run();
 
-console.log(`已插入 ${result.changes} 条情绪日记 Mock 数据`);
+console.log(
+  `已在演示账号 ${DEMO_USERNAME}（密码 ${DEMO_PASSWORD}）下插入 ${result.changes} 条情绪日记 Mock 数据`
+);

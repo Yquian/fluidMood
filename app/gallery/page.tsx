@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
+import { useAuth } from "@/components/auth/AuthProvider";
 import { VisualCalendar } from "@/components/ui/VisualCalendar";
 import type { EmotionRecord } from "@/utils/mockData";
 
@@ -20,6 +21,9 @@ type MoodEntryResponse = {
 };
 
 export default function GalleryPage() {
+  const { user, status, openAuthModal } = useAuth();
+  const isAuthenticated = status === "authenticated" && Boolean(user);
+
   const [records, setRecords] = useState<EmotionRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [newId, setNewId] = useState<number | null>(null);
@@ -32,12 +36,29 @@ export default function GalleryPage() {
     }
   }, []);
 
+  // 未登录时弹出登录框，而不是把人赶回首页
   useEffect(() => {
+    if (status === "unauthenticated") {
+      openAuthModal();
+    }
+  }, [status, openAuthModal]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+
     let cancelled = false;
 
     async function loadRecords() {
       try {
         const response = await fetch("/api/moods", { cache: "no-store" });
+
+        if (response.status === 401) {
+          openAuthModal();
+          return;
+        }
+
         if (!response.ok) {
           throw new Error(`读取情绪记录失败: ${response.status}`);
         }
@@ -68,7 +89,7 @@ export default function GalleryPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isAuthenticated, openAuthModal]);
 
   return (
     <main className="relative isolate flex h-dvh flex-col overflow-y-auto overflow-x-hidden bg-[#FDFBF7] px-3 [scrollbar-color:#E7E5E4_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar-thumb:hover]:bg-stone-300 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-stone-200 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5 sm:px-6">
@@ -118,7 +139,11 @@ export default function GalleryPage() {
         </header>
 
         <section className="flex flex-1 items-center py-8">
-          {loading ? (
+          {!isAuthenticated ? (
+            <p className="w-full text-center text-sm tracking-wide text-stone-400">
+              登录后即可查看属于你的情绪画廊。
+            </p>
+          ) : loading ? (
             <p className="w-full text-center text-sm tracking-wide text-stone-400">
               正在加载情绪记录...
             </p>

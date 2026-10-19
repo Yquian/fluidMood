@@ -2,8 +2,10 @@ import { NextResponse } from "next/server";
 
 import { db } from "@/db";
 import { moodEntries } from "@/db/schema";
+import { getSessionUser } from "@/lib/auth/session";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const HEX_COLOR = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
 
@@ -18,6 +20,11 @@ type RecordMoodBody = {
 };
 
 export async function POST(request: Request) {
+  const user = getSessionUser();
+  if (!user) {
+    return NextResponse.json({ error: "请先登录" }, { status: 401 });
+  }
+
   let body: RecordMoodBody;
   try {
     body = await request.json();
@@ -52,6 +59,7 @@ export async function POST(request: Request) {
     const [created] = db
       .insert(moodEntries)
       .values({
+        userId: user.id,
         text: (text as string).trim(),
         primaryColor: primaryColor as string,
         secondaryColor: secondaryColor as string,

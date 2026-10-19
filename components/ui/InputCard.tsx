@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { MoodCard } from "@/components/ui/MoodCard";
 import { Textarea } from "@/components/ui/textarea";
 import { FluidBackground } from "@/components/three/FluidBackground";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { cn } from "@/lib/utils";
 import {
   emotionKeywords,
@@ -120,6 +121,8 @@ export function InputCard({
   ...props
 }: React.ComponentProps<"form">) {
   const router = useRouter();
+  const { user, status, openAuthModal } = useAuth();
+  const isAuthenticated = status === "authenticated" && Boolean(user);
   const [value, setValue] = React.useState("");
   const [pending, setPending] = React.useState(false);
   const [card, setCard] = React.useState<EmotionCardData | null>(null);
@@ -128,6 +131,13 @@ export function InputCard({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    // 未登录时先登录再记录
+    if (!isAuthenticated) {
+      openAuthModal();
+      return;
+    }
+
     const text = value.trim();
     if (!text || pending) return;
 
@@ -242,10 +252,23 @@ export function InputCard({
               <Textarea
                 value={value}
                 onChange={(event) => setValue(event.target.value)}
-                placeholder="今天感觉怎么样..."
+                onFocus={() => {
+                  // 未登录时点开输入框先登录
+                  if (!isAuthenticated) {
+                    openAuthModal();
+                  }
+                }}
+                readOnly={!isAuthenticated}
+                placeholder={
+                  isAuthenticated
+                    ? "今天感觉怎么样..."
+                    : "登录后即可记录今天的心情"
+                }
                 aria-label="今天的情绪日记"
                 rows={7}
-                className="relative min-h-[200px] resize-none rounded-[calc(1.5rem-1px)] border-0 bg-transparent px-6 py-6 text-base leading-relaxed text-zinc-900 shadow-none placeholder:text-zinc-400 focus-visible:ring-0 focus-visible:ring-offset-0 sm:text-lg md:text-lg [scrollbar-color:#E7E5E4_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar-thumb:hover]:bg-stone-300 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-stone-200 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5"
+                className={`relative min-h-[200px] resize-none rounded-[calc(1.5rem-1px)] border-0 bg-transparent px-6 py-6 text-base leading-relaxed text-zinc-900 shadow-none placeholder:text-zinc-400 focus-visible:ring-0 focus-visible:ring-offset-0 sm:text-lg md:text-lg ${
+                  isAuthenticated ? "" : "cursor-pointer"
+                } [scrollbar-color:#E7E5E4_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar-thumb:hover]:bg-stone-300 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-stone-200 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5`}
               />
             </div>
           </div>

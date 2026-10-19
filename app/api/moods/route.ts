@@ -1,8 +1,9 @@
-import { desc } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { db } from "@/db";
 import { moodEntries } from "@/db/schema";
+import { getSessionUser } from "@/lib/auth/session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,10 +22,16 @@ function parseTags(value: string): string[] {
 }
 
 export async function GET() {
+  const user = getSessionUser();
+  if (!user) {
+    return NextResponse.json({ error: "请先登录" }, { status: 401 });
+  }
+
   try {
     const rows = db
       .select()
       .from(moodEntries)
+      .where(eq(moodEntries.userId, user.id))
       .orderBy(desc(moodEntries.createdAt))
       .limit(RECENT_LIMIT)
       .all();

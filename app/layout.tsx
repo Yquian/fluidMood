@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 import { SiteNav } from "@/components/ui/SiteNav";
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
 import "./globals.css";
@@ -58,9 +59,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SiteNav />
-        {children}
-        <ServiceWorkerRegister />
+        <AuthProvider>
+          <SiteNav />
+          {children}
+          <ServiceWorkerRegister />
+        </AuthProvider>
       </body>
     </html>
   );

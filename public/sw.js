@@ -1,4 +1,4 @@
-const CACHE_NAME = "fluid-mood-v1";
+const CACHE_NAME = "fluid-mood-v2";
 const PRECACHE_URLS = [
   "/manifest.webmanifest",
   "/icons/icon-192.png",

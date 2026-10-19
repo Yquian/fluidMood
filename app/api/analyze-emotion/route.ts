@@ -2,7 +2,10 @@ import { readFile } from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
 
+import { getSessionUser } from "@/lib/auth/session";
+
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const API_KEY = process.env.DEEPSEEK_API_KEY;
 const BASE_URL = "https://api.deepseek.com";
@@ -19,6 +22,10 @@ const FALLBACK_MOOD = {
 };
 
 export async function POST(request: Request) {
+  if (!getSessionUser()) {
+    return NextResponse.json({ error: "请先登录" }, { status: 401 });
+  }
+
   let body: { text?: unknown };
   try {
     body = await request.json();
